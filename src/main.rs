@@ -39,16 +39,7 @@ fn extract_polyline(json_str: &str) -> Result<String> {
         serde_json::from_str(json_str).context("Error parsing JSON input")?;
 
     let polyline_str = json
-        .get("trails")
-        .and_then(|trails| trails.get(0))
-        .and_then(|trail| trail.get("defaultMap"))
-        .and_then(|default_map| default_map.get("routes"))
-        .and_then(|routes| routes.get(0))
-        .and_then(|route| route.get("lineSegments"))
-        .and_then(|segments| segments.get(0))
-        .and_then(|segment| segment.get("polyline"))
-        .and_then(|polyline| polyline.get("pointsData"))
-        .and_then(|points| points.as_str())
+        .pointer("/trails/0/defaultMap/routes/0/lineSegments/0/polyline/pointsData")
         .ok_or_else(|| anyhow::anyhow!("Polyline data not found in JSON"))?;
 
     Ok(polyline_str.to_string())
@@ -60,10 +51,7 @@ fn extract_route_name(json_str: &str) -> Result<String> {
         serde_json::from_str(json_str).context("Error parsing JSON input for route name")?;
 
     let route_name = json
-        .get("trails")
-        .and_then(|trails| trails.get(0))
-        .and_then(|trail| trail.get("name"))
-        .and_then(|name| name.as_str())
+        .pointer("/trails/0/name")
         .ok_or_else(|| anyhow::anyhow!("Route name not found in JSON"))?;
 
     Ok(route_name.to_string())
