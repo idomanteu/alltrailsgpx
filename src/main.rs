@@ -36,19 +36,15 @@ fn read_input(input: &Option<String>) -> Result<String> {
 }
 
 fn extract_polyline(json: &Value) -> Result<String> {
-    let polyline_str = json
-        .pointer("/trails/0/defaultMap/routes/0/lineSegments/0/polyline/pointsData")
-        .ok_or_else(|| anyhow::anyhow!("Polyline data not found in JSON"))?;
-
-    Ok(polyline_str.to_string())
+    json.pointer("/trails/0/defaultMap/routes/0/lineSegments/0/polyline/pointsData")
+        .context("Polyline data not found in JSON")
+        .map(|v| v.to_string())
 }
 
 fn extract_route_name(json: &Value) -> Result<String> {
-    let route_name = json
-        .pointer("/trails/0/name")
-        .ok_or_else(|| anyhow::anyhow!("Route name not found in JSON"))?;
-
-    Ok(route_name.to_string())
+    json.pointer("/trails/0/name")
+        .context("Route name not found in JSON")
+        .map(|v| v.to_string())
 }
 
 fn create_gpx(line_string: geo_types::LineString<f64>, name: String) -> Track {
@@ -88,8 +84,8 @@ fn main() -> Result<()> {
 
     let json: Value = serde_json::from_str(&json_str).context("Failed to parse JSON input")?;
 
-    let polyline_str = extract_polyline(&json).context("Failed to extract polyline")?;
-    let route_name = extract_route_name(&json).context("Failed to extract route name")?;
+    let polyline_str = extract_polyline(&json)?;
+    let route_name = extract_route_name(&json)?;
 
     let line_string =
         polyline::decode_polyline(&polyline_str, 5).context("Failed to decode polyline")?;
