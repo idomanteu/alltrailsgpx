@@ -1,6 +1,7 @@
 use anyhow::{Context, Result};
 use clap::Parser;
 use gpx::{Gpx, GpxVersion, Track, TrackSegment, Waypoint};
+use serde_json::Value;
 use std::fs::File;
 use std::io::{BufWriter, Read, Write};
 
@@ -34,10 +35,7 @@ fn read_input(input: &Option<String>) -> Result<String> {
     Ok(contents)
 }
 
-fn extract_polyline(json_str: &str) -> Result<String> {
-    let json: serde_json::Value =
-        serde_json::from_str(json_str).context("Error parsing JSON input")?;
-
+fn extract_polyline(json: &Value) -> Result<String> {
     let polyline_str = json
         .pointer("/trails/0/defaultMap/routes/0/lineSegments/0/polyline/pointsData")
         .ok_or_else(|| anyhow::anyhow!("Polyline data not found in JSON"))?;
@@ -45,11 +43,7 @@ fn extract_polyline(json_str: &str) -> Result<String> {
     Ok(polyline_str.to_string())
 }
 
-/// Extracts the route name from the JSON.
-fn extract_route_name(json_str: &str) -> Result<String> {
-    let json: serde_json::Value =
-        serde_json::from_str(json_str).context("Error parsing JSON input for route name")?;
-
+fn extract_route_name(json: &Value) -> Result<String> {
     let route_name = json
         .pointer("/trails/0/name")
         .ok_or_else(|| anyhow::anyhow!("Route name not found in JSON"))?;
@@ -57,7 +51,6 @@ fn extract_route_name(json_str: &str) -> Result<String> {
     Ok(route_name.to_string())
 }
 
-/// Creates a GPX track using the decoded polyline and the given route name.
 fn create_gpx(line_string: geo_types::LineString<f64>, name: String) -> Track {
     let waypoints = line_string
         .0
@@ -93,11 +86,10 @@ fn main() -> Result<()> {
 
     let json_str = read_input(&args.input).context("Failed to read input")?;
 
-    let polyline_str =
-        extract_polyline(&json_str).context("Failed to extract polyline from JSON")?;
+    let json: Value = serde_json::from_str(&json_str).context("Failed to parse JSON input")?;
 
-    let route_name =
-        extract_route_name(&json_str).context("Failed to extract route name from JSON")?;
+    let polyline_str = extract_polyline(&json).context("Failed to extract polyline")?;
+    let route_name = extract_route_name(&json).context("Failed to extract route name")?;
 
     let line_string =
         polyline::decode_polyline(&polyline_str, 5).context("Failed to decode polyline")?;
