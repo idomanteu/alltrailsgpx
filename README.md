@@ -1,24 +1,41 @@
-# alltrailsgpx | [![Tests](https://img.shields.io/github/actions/workflow/status/cdown/alltrailsgpx/ci.yml?branch=master)](https://github.com/cdown/alltrailsgpx/actions?query=branch%3Amaster)
+# alltrailsgpx
 
-alltrailsgpx creates a GPX file from AllTrails route data, even if you don't
-have the region unlocked. It extracts the map drawing data directly from the
-AllTrails API response and converts it into a GPX track.
+alltrailsgpx creates a GPX file from AllTrails route data, even if you don't have the region unlocked. It extracts the map drawing data directly from the AllTrails API response and converts it into a GPX track.
 
 ## Installation
 
-    cargo install alltrailsgpx
+1. Install [Tampermonkey](https://www.tampermonkey.net/) browser extension
+2. Click [here to install the script](https://github.com/idomanteu/alltrailsgpx/raw/main/alltrails-gpx-downloader.user.js) or copy the code manually
+3. The script automatically activates on all AllTrails trail pages
 
 ## Usage
 
-First, get the input file.
+1. Navigate to any AllTrails trail page (e.g., `https://www.alltrails.com/trail/us/vermont/mount-mansfield-via-long-and-hazelton-trail`)
+2. Look for the green "Download GPX" button on the page
+3. Click the button to download the GPX file
 
-1. Open the full screen map page for the route you want to convert (e.g., `https://www.alltrails.com/en-gb/trail/england/bristol/bristol-and-abbots-leigh-circular`)
-2. Open your browser's developer tools and navigate to the network tab.
-3. Find the network request to the AllTrails API, which will look similar (e.g., `https://www.alltrails.com/api/alltrails/v3/trails/{route_id}`)
-4. Save the response to a file.
+The userscript automatically:
 
-Now you can provide this response to alltrailsgpx. By default the GPX is read
-from stdin and written to stdout, but you can also output it to a file. For
-example:
+- Intercepts the API response when you click the button
+- Decodes the polyline data from AllTrails' format
+- Converts it to standard GPX 1.1 format
+- Downloads the file with the full route name (e.g., `Mount Mansfield via Long and Hazelton Trail.gpx`)
 
-    alltrailsgpx -i route.json -o route.gpx
+## How It Works
+
+The userscript:
+
+1. Adds a download button to AllTrails trail pages
+2. Intercepts network requests to capture the trail API data from `https://www.alltrails.com/api/alltrails/v3/trails/{route_id}`
+3. Extracts the encoded polyline from the API response at path: `/trails/0/defaultMap/routes/0/lineSegments/0/polyline/pointsData`
+4. Decodes the Google polyline format (precision 5) into an array of latitude/longitude coordinates
+5. Converts the coordinates into GPX format:
+   - Creates a GPX 1.1 XML document with proper namespace declarations
+   - Wraps coordinates in a `<trk>` (track) element with the trail name
+   - Each coordinate becomes a `<trkpt>` (track point) with lat/lon attributes
+   - Groups all points into a single `<trkseg>` (track segment)
+6. Triggers a browser download of the GPX file with the trail's full name
+
+## Credits
+
+This userscript is based on the original [alltrailsgpx](https://github.com/cdown/alltrailsgpx) project by Chris Down, which was implemented as a Rust command-line tool. This JavaScript version provides the same functionality directly in the browser for easier use.
