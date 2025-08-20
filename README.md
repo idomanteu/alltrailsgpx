@@ -8,8 +8,6 @@ alltrailsgpx creates a GPX file from AllTrails route data, even if you don't hav
 2. Click [here to install the script](https://github.com/idomanteu/alltrailsgpx/raw/main/alltrails-gpx-downloader.user.js) or copy the code manually
 3. The script automatically activates on all AllTrails trail pages
 
-<img width="1150" height="622" alt="Screenshot 2025-08-19 at 10 07 37 PM" src="https://github.com/user-attachments/assets/03403a99-c949-4645-9e4b-affd21aa1a6b" />
-
 ## Usage
 
 1. Navigate to any AllTrails trail page (e.g., `https://www.alltrails.com/trail/us/vermont/mount-mansfield-via-long-and-hazelton-trail`)
@@ -22,6 +20,8 @@ The userscript automatically:
 - Decodes the polyline data from AllTrails' format
 - Converts it to standard GPX 1.1 format
 - Downloads the file with the full route name (e.g., `Mount Mansfield via Long and Hazelton Trail.gpx`)
+
+<img width="1150" height="622" alt="demo" src="https://github.com/user-attachments/assets/03403a99-c949-4645-9e4b-affd21aa1a6b" />
 
 ## How It Works
 
