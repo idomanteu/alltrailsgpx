@@ -1,6 +1,6 @@
 # alltrailsgpx
 
-alltrailsgpx creates a GPX file from AllTrails route data, even if you don't have the region unlocked. It extracts the map drawing data directly from the AllTrails API response and converts it into a GPX track.
+alltrailsgpx creates a GPX file from AllTrails route data, even if you don't have the region unlocked (or AllTrails premium). It extracts the map drawing data directly from the AllTrails API response and converts it into a GPX track.
 
 ## Installation
 
