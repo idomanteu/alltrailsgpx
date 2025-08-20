@@ -41,3 +41,6 @@ The userscript:
 ## Credits
 
 This userscript is based on the original [alltrailsgpx](https://github.com/cdown/alltrailsgpx) project by Chris Down, which was implemented as a Rust command-line tool. This JavaScript version provides the same functionality directly in the browser for easier use.
+
+This project is licensed under the [MIT License](LICENSE).
+
